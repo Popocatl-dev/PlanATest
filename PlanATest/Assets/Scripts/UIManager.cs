@@ -1,7 +1,9 @@
 using UnityEngine;
 using TMPro;
 
-
+    /// <summary>
+    /// Updates the moves and score texts
+    /// </summary>
 public class UIManager : MonoBehaviour
 {
     [Header("UI References")]

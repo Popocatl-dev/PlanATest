@@ -1,22 +1,26 @@
 using UnityEngine;
-
+/// <summary>
+/// Controls the game loop and input functions
+/// </summary>
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private UIManager UIObject;
     [SerializeField] private GameOverManager gameOverObject;
+    [SerializeField] private GridManager gridObject;
+
 
     [Header("Start Game Values")]
     [SerializeField] private int initialMoves = 5;
     [SerializeField] private int initialScore = 0;
+    
+    public int currentMoves { get; private set; } 
+    public int currentScore { get; private set; } 
 
-    private int currentMoves;
-    private int currentScore;
-
-    public int GetMoves() => currentMoves;
-    public int GetScore() => currentScore;
 
     private void Start()
     {
+        gridObject.GenerateGrid();
+        gridObject.OnComboCollected += HandleComboCollected;
         Reset();
     }
 
@@ -27,6 +31,7 @@ public class GameManager : MonoBehaviour
         currentScore = initialScore;
 
         UIObject.ResetUI(currentMoves, currentScore);
+        gridObject.ResetGrid();
         gameOverObject.HideGameOver();
     }
 
@@ -40,7 +45,7 @@ public class GameManager : MonoBehaviour
     {
         currentMoves = Mathf.Max(0, currentMoves - amount);
         UIObject.UpdateMovesText(currentMoves);
-        gameOverObject.CheckGameOver(currentMoves);
+        gameOverObject.CheckGameOver(currentMoves, currentScore);
     }
 
     public void SetScore(int value)
@@ -53,5 +58,12 @@ public class GameManager : MonoBehaviour
     {
         currentScore += amount;
         UIObject.UpdateScoreText(currentScore);
+    }
+
+    private bool HandleComboCollected(int blocksCollected)
+    {
+        AddScore(blocksCollected);
+        DecreaseMoves();
+        return gameOverObject.isGameOver;
     }
 }
